@@ -63,7 +63,7 @@ export function Dashboard({ channelName, channelId, data, topVideos = [], recent
   return (
     <div className="min-h-screen">
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur border-b">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-4">
+        <div className="px-4 md:px-8 py-4">
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <Button
               variant="ghost"
@@ -81,7 +81,7 @@ export function Dashboard({ channelName, channelId, data, topVideos = [], recent
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+      <div className="px-4 md:px-8 py-8">
         <div className="mb-8">
           <div className="flex items-start justify-between gap-4 flex-wrap mb-4">
             <div>

@@ -58,11 +58,11 @@ export function VideoCard({
             <ExternalLink className="h-3 w-3" />
           </div>
         </div>
-        <div className="p-4 space-y-3">
-          <h4 className="font-semibold line-clamp-2 leading-snug" data-testid={`text-video-title-${videoId}`}>
+        <div className="p-3 space-y-2.5">
+          <h4 className="font-semibold line-clamp-2 leading-snug text-sm" data-testid={`text-video-title-${videoId}`}>
             {title}
           </h4>
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <div className="flex items-center gap-1">
               <Eye className="h-3 w-3" />
               <span>{formatNumber(viewCount)}</span>
