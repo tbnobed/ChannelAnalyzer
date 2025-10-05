@@ -119,17 +119,12 @@ export function Dashboard({ channelName, channelId, data, topVideos = [], recent
           />
         </div>
 
-        <div className="mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <SubscriberChart
             data={data.subscribers.chartData}
             labels={data.subscribers.chartLabels}
           />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <AIInsights insights={data.aiInsights} />
-          </div>
+          <AIInsights insights={data.aiInsights} />
         </div>
 
         {topVideos.length > 0 && (
