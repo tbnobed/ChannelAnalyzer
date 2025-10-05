@@ -9,16 +9,17 @@ if (!process.env.DATABASE_URL) {
 }
 
 let db;
+let pgPool: PgPool | null = null;
 
 if (process.env.NODE_ENV === 'production') {
   // Use standard PostgreSQL driver for production (Docker)
-  const pool = new PgPool({ 
+  pgPool = new PgPool({ 
     connectionString: process.env.DATABASE_URL,
     max: 20,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 2000,
   });
-  db = drizzlePg(pool);
+  db = drizzlePg(pgPool);
 } else {
   // Use Neon serverless driver for development (Replit)
   neonConfig.webSocketConstructor = ws;
@@ -28,4 +29,4 @@ if (process.env.NODE_ENV === 'production') {
   db = drizzleNeon(pool);
 }
 
-export { db };
+export { db, pgPool };

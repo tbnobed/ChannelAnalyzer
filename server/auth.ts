@@ -5,6 +5,8 @@ import { storage } from "./storage";
 import type { User } from "@shared/schema";
 import type { Express, Request, Response, NextFunction } from "express";
 import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
+import { pgPool } from "../db";
 
 declare global {
   namespace Express {
@@ -17,18 +19,28 @@ declare global {
 
 export function setupAuth(app: Express) {
   // Session configuration
-  app.use(
-    session({
-      secret: process.env.SESSION_SECRET || "youtube-analyzer-secret-key-change-in-production",
-      resave: false,
-      saveUninitialized: false,
-      cookie: {
-        secure: process.env.NODE_ENV === "production",
-        httpOnly: true,
-        maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
-      },
-    })
-  );
+  const sessionConfig: session.SessionOptions = {
+    secret: process.env.SESSION_SECRET || "youtube-analyzer-secret-key-change-in-production",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+    },
+  };
+
+  // Use PostgreSQL session store in production
+  if (process.env.NODE_ENV === "production" && pgPool) {
+    const PostgreSQLStore = connectPgSimple(session);
+    sessionConfig.store = new PostgreSQLStore({
+      pool: pgPool,
+      tableName: "session",
+      createTableIfMissing: true,
+    });
+  }
+
+  app.use(session(sessionConfig));
 
   // Initialize Passport
   app.use(passport.initialize());
