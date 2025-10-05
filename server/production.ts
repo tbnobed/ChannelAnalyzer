@@ -1,9 +1,14 @@
 import express, { type Request, Response, NextFunction } from "express";
 import path from "path";
 import fs from "fs";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 import { registerRoutes } from "./routes";
 import { setupAuth } from "./auth";
 import { initializeAdmin } from "./init-admin";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 app.use(express.json());

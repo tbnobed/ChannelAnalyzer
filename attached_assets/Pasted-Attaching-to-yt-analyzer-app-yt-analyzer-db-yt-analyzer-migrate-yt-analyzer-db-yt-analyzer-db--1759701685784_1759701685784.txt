@@ -1,0 +1,96 @@
+Attaching to yt-analyzer-app, yt-analyzer-db, yt-analyzer-migrate
+yt-analyzer-db  | 
+yt-analyzer-db  | PostgreSQL Database directory appears to contain a database; Skipping initialization
+yt-analyzer-db  | 
+yt-analyzer-db  | 2025-10-05 22:00:51.138 UTC [1] LOG:  starting PostgreSQL 16.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 14.2.0) 14.2.0, 64-bit
+yt-analyzer-db  | 2025-10-05 22:00:51.138 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+yt-analyzer-db  | 2025-10-05 22:00:51.138 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+yt-analyzer-db  | 2025-10-05 22:00:51.139 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+yt-analyzer-db  | 2025-10-05 22:00:51.143 UTC [29] LOG:  database system was shut down at 2025-10-05 22:00:16 UTC
+yt-analyzer-db  | 2025-10-05 22:00:51.150 UTC [1] LOG:  database system is ready to accept connections
+yt-analyzer-migrate  | No config path provided, using default 'drizzle.config.ts'
+yt-analyzer-migrate  | Reading config file '/app/drizzle.config.ts'
+yt-analyzer-migrate  | Using 'pg' driver for database querying
+yt-analyzer-migrate  | [⣷] Pulling schema from database...
+[✓] Pulling schema from database...
+yt-analyzer-migrate  | [✓] Changes applied
+yt-analyzer-migrate exited with code 0
+yt-analyzer-app      | Warning: connect.session() MemoryStore is not
+yt-analyzer-app      | designed for a production environment, as it will leak
+yt-analyzer-app      | memory, and will not scale past a single process.
+yt-analyzer-app      | ✓ Admin account created successfully
+yt-analyzer-app      |   Username: admin
+yt-analyzer-app      |   Password: admin123
+yt-analyzer-app      |   Please change the password after first login
+yt-analyzer-app      | file:///app/dist/production.js:665
+yt-analyzer-app      |   const distPath = path.join(__dirname, "..", "dist", "public");
+yt-analyzer-app      |                              ^
+yt-analyzer-app      | 
+yt-analyzer-app      | ReferenceError: __dirname is not defined
+yt-analyzer-app      |     at file:///app/dist/production.js:665:30
+yt-analyzer-app      |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+yt-analyzer-app      | 
+yt-analyzer-app      | Node.js v20.19.5
+yt-analyzer-app exited with code 1 (restarting)
+yt-analyzer-app      | Warning: connect.session() MemoryStore is not
+yt-analyzer-app      | designed for a production environment, as it will leak
+yt-analyzer-app      | memory, and will not scale past a single process.
+yt-analyzer-app      | ✓ Admin account already exists
+yt-analyzer-app      | file:///app/dist/production.js:665
+yt-analyzer-app      |   const distPath = path.join(__dirname, "..", "dist", "public");
+yt-analyzer-app      |                              ^
+yt-analyzer-app      | 
+yt-analyzer-app      | ReferenceError: __dirname is not defined
+yt-analyzer-app      |     at file:///app/dist/production.js:665:30
+yt-analyzer-app      |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+yt-analyzer-app      | 
+yt-analyzer-app      | Node.js v20.19.5
+yt-analyzer-app exited with code 1 (restarting)
+yt-analyzer-app      | Warning: connect.session() MemoryStore is not
+yt-analyzer-app      | designed for a production environment, as it will leak
+yt-analyzer-app      | memory, and will not scale past a single process.
+yt-analyzer-app      | ✓ Admin account already exists
+yt-analyzer-app      | file:///app/dist/production.js:665
+yt-analyzer-app      |   const distPath = path.join(__dirname, "..", "dist", "public");
+yt-analyzer-app      |                              ^
+yt-analyzer-app      | 
+yt-analyzer-app      | ReferenceError: __dirname is not defined
+yt-analyzer-app      |     at file:///app/dist/production.js:665:30
+yt-analyzer-app      |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+yt-analyzer-app      | 
+yt-analyzer-app      | Node.js v20.19.5
+yt-analyzer-app exited with code 1 (restarting)
+yt-analyzer-app      | Warning: connect.session() MemoryStore is not
+yt-analyzer-app      | designed for a production environment, as it will leak
+yt-analyzer-app      | memory, and will not scale past a single process.
+yt-analyzer-app      | ✓ Admin account already exists
+yt-analyzer-app      | file:///app/dist/production.js:665
+yt-analyzer-app      |   const distPath = path.join(__dirname, "..", "dist", "public");
+yt-analyzer-app      |                              ^
+yt-analyzer-app      | 
+yt-analyzer-app      | ReferenceError: __dirname is not defined
+yt-analyzer-app      |     at file:///app/dist/production.js:665:30
+yt-analyzer-app      |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+yt-analyzer-app      | 
+yt-analyzer-app      | Node.js v20.19.5
+yt-analyzer-app exited with code 1 (restarting)
+yt-analyzer-app      | Warning: connect.session() MemoryStore is not
+yt-analyzer-app      | designed for a production environment, as it will leak
+yt-analyzer-app      | memory, and will not scale past a single process.
+yt-analyzer-app      | ✓ Admin account already exists
+yt-analyzer-app      | file:///app/dist/production.js:665
+yt-analyzer-app      |   const distPath = path.join(__dirname, "..", "dist", "public");
+yt-analyzer-app      |                              ^
+yt-analyzer-app      | 
+yt-analyzer-app      | ReferenceError: __dirname is not defined
+yt-analyzer-app      |     at file:///app/dist/production.js:665:30
+yt-analyzer-app      |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+yt-analyzer-app      | 
+yt-analyzer-app      | Node.js v20.19.5
+yt-analyzer-app exited with code 1 (restarting)
+Gracefully Stopping... press Ctrl+C again to force
+ Container yt-analyzer-app  Stopping
+ Container yt-analyzer-app  Stopped
+ Container yt-analyzer-migrate  Stopping
+ Container yt-analyzer-migrate  Stopped
+ Container yt-analyzer-db  Stopping
