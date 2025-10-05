@@ -15,5 +15,5 @@ COPY shared ./shared
 COPY drizzle.config.ts ./drizzle.config.ts
 COPY db.ts ./db.ts
 
-# Run drizzle-kit directly (it will use ts-node to load the TypeScript config)
-CMD ["npx", "drizzle-kit", "push", "--yes"]
+# Run drizzle-kit push (in non-interactive mode it will auto-confirm)
+CMD ["npx", "drizzle-kit", "push"]

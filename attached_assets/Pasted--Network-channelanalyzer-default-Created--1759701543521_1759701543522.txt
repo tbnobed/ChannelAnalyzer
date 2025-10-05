@@ -1,0 +1,67 @@
+ ✔ Network channelanalyzer_default       Created                                                                                                                                                                                                                                               0.0s 
+ ✔ Volume channelanalyzer_postgres_data  Created                                                                                                                                                                                                                                               0.0s 
+ ✔ Container yt-analyzer-db              Healthy                                                                                                                                                                                                                                              11.6s 
+ ✘ Container yt-analyzer-migrate         service "migrate" didn't complete successfully: exit 1                                                                                                                                                                                               12.1s 
+ ✔ Container yt-analyzer-app             Created                                                                                                                                                                                                                                               0.0s 
+service "migrate" didn't complete successfully: exit 1
+obtv-admin@yt-analyzer:~/ChannelAnalyzer$ docker compose logs -f
+WARN[0000] /home/obtv-admin/ChannelAnalyzer/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion 
+yt-analyzer-migrate  | Unrecognized options for command 'push': --yes
+yt-analyzer-db       | The files belonging to this database system will be owned by user "postgres".
+yt-analyzer-db       | This user must also own the server process.
+yt-analyzer-db       | 
+yt-analyzer-db       | The database cluster will be initialized with locale "en_US.utf8".
+yt-analyzer-db       | The default database encoding has accordingly been set to "UTF8".
+yt-analyzer-db       | The default text search configuration will be set to "english".
+yt-analyzer-db       | 
+yt-analyzer-db       | Data page checksums are disabled.
+yt-analyzer-db       | 
+yt-analyzer-db       | fixing permissions on existing directory /var/lib/postgresql/data ... ok
+yt-analyzer-db       | creating subdirectories ... ok
+yt-analyzer-db       | selecting dynamic shared memory implementation ... posix
+yt-analyzer-db       | selecting default max_connections ... 100
+yt-analyzer-db       | selecting default shared_buffers ... 128MB
+yt-analyzer-db       | selecting default time zone ... UTC
+yt-analyzer-db       | creating configuration files ... ok
+yt-analyzer-db       | running bootstrap script ... ok
+yt-analyzer-db       | sh: locale: not found
+yt-analyzer-db       | 2025-10-05 21:58:24.993 UTC [35] WARNING:  no usable system locales were found
+yt-analyzer-db       | performing post-bootstrap initialization ... ok
+yt-analyzer-db       | initdb: warning: enabling "trust" authentication for local connections
+yt-analyzer-db       | syncing data to disk ... ok
+yt-analyzer-db       | 
+yt-analyzer-db       | 
+yt-analyzer-db       | Success. You can now start the database server using:
+yt-analyzer-db       | 
+yt-analyzer-db       |     pg_ctl -D /var/lib/postgresql/data -l logfile start
+yt-analyzer-db       | 
+yt-analyzer-db       | initdb: hint: You can change this by editing pg_hba.conf or using the option -A, or --auth-local and --auth-host, the next time you run initdb.
+yt-analyzer-db       | waiting for server to start....2025-10-05 21:58:25.919 UTC [41] LOG:  starting PostgreSQL 16.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 14.2.0) 14.2.0, 64-bit
+yt-analyzer-db       | 2025-10-05 21:58:25.919 UTC [41] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+yt-analyzer-db       | 2025-10-05 21:58:25.923 UTC [44] LOG:  database system was shut down at 2025-10-05 21:58:25 UTC
+yt-analyzer-db       | 2025-10-05 21:58:25.930 UTC [41] LOG:  database system is ready to accept connections
+yt-analyzer-db       |  done
+yt-analyzer-db       | server started
+yt-analyzer-db       | CREATE DATABASE
+yt-analyzer-db       | 
+yt-analyzer-db       | 
+yt-analyzer-db       | /usr/local/bin/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+yt-analyzer-db       | 
+yt-analyzer-db       | waiting for server to shut down....2025-10-05 21:58:26.089 UTC [41] LOG:  received fast shutdown request
+yt-analyzer-db       | 2025-10-05 21:58:26.090 UTC [41] LOG:  aborting any active transactions
+yt-analyzer-db       | 2025-10-05 21:58:26.094 UTC [41] LOG:  background worker "logical replication launcher" (PID 47) exited with exit code 1
+yt-analyzer-db       | 2025-10-05 21:58:26.094 UTC [42] LOG:  shutting down
+yt-analyzer-db       | 2025-10-05 21:58:26.095 UTC [42] LOG:  checkpoint starting: shutdown immediate
+yt-analyzer-db       | 2025-10-05 21:58:26.134 UTC [42] LOG:  checkpoint complete: wrote 926 buffers (5.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.021 s, sync=0.016 s, total=0.040 s; sync files=301, longest=0.001 s, average=0.001 s; distance=4272 kB, estimate=4272 kB; lsn=0/191E928, redo lsn=0/191E928
+yt-analyzer-db       | 2025-10-05 21:58:26.145 UTC [41] LOG:  database system is shut down
+yt-analyzer-db       |  done
+yt-analyzer-db       | server stopped
+yt-analyzer-db       | 
+yt-analyzer-db       | PostgreSQL init process complete; ready for start up.
+yt-analyzer-db       | 
+yt-analyzer-db       | 2025-10-05 21:58:26.222 UTC [1] LOG:  starting PostgreSQL 16.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 14.2.0) 14.2.0, 64-bit
+yt-analyzer-db       | 2025-10-05 21:58:26.222 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+yt-analyzer-db       | 2025-10-05 21:58:26.222 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+yt-analyzer-db       | 2025-10-05 21:58:26.224 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+yt-analyzer-db       | 2025-10-05 21:58:26.227 UTC [57] LOG:  database system was shut down at 2025-10-05 21:58:26 UTC
+yt-analyzer-db       | 2025-10-05 21:58:26.234 UTC [1] LOG:  database system is ready to accept connections
