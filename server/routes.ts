@@ -10,11 +10,6 @@ const analyzeRequestSchema = z.object({
   channelUrl: z.string(),
 });
 
-const registerSchema = z.object({
-  username: z.string().min(3).max(50),
-  password: z.string().min(6),
-});
-
 const loginSchema = z.object({
   username: z.string(),
   password: z.string(),
@@ -22,35 +17,6 @@ const loginSchema = z.object({
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
-  app.post("/api/auth/register", async (req, res) => {
-    try {
-      const { username, password } = registerSchema.parse(req.body);
-      
-      const existingUser = await storage.getUserByUsername(username);
-      if (existingUser) {
-        return res.status(400).json({ error: "Username already exists" });
-      }
-
-      const hashedPassword = await hashPassword(password);
-      const user = await storage.createUser({
-        username,
-        password: hashedPassword,
-      });
-
-      req.login({ id: user.id, username: user.username }, (err) => {
-        if (err) {
-          return res.status(500).json({ error: "Failed to login after registration" });
-        }
-        res.json({ user: { id: user.id, username: user.username } });
-      });
-    } catch (error: any) {
-      if (error.name === "ZodError") {
-        return res.status(400).json({ error: "Invalid input", details: error.errors });
-      }
-      res.status(500).json({ error: error.message });
-    }
-  });
-
   app.post("/api/auth/login", (req, res, next) => {
     try {
       loginSchema.parse(req.body);

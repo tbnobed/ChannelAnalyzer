@@ -91,17 +91,6 @@ export default function Login() {
             {isLoading ? "Logging in..." : "Login"}
           </Button>
         </form>
-
-        <div className="mt-6 text-center text-sm">
-          <span className="text-muted-foreground">Don't have an account? </span>
-          <button
-            onClick={() => setLocation("/register")}
-            className="text-primary hover:underline"
-            data-testid="link-register"
-          >
-            Register
-          </button>
-        </div>
       </Card>
     </div>
   );

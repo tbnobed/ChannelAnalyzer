@@ -7,7 +7,6 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import Home from "@/pages/Home";
 import Login from "@/pages/Login";
-import Register from "@/pages/Register";
 import NotFound from "@/pages/not-found";
 
 function ProtectedRoute({ component: Component }: { component: () => JSX.Element }) {
@@ -43,9 +42,6 @@ function Router() {
     <Switch>
       <Route path="/login">
         {user ? <Redirect to="/" /> : <Login />}
-      </Route>
-      <Route path="/register">
-        {user ? <Redirect to="/" /> : <Register />}
       </Route>
       <Route path="/">
         <ProtectedRoute component={Home} />
