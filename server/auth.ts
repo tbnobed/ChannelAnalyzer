@@ -85,6 +85,14 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
   res.status(401).json({ error: "Unauthorized" });
 }
 
+// Middleware to check if user is admin
+export function requireAdmin(req: Request, res: Response, next: NextFunction) {
+  if (req.isAuthenticated() && req.user?.username === "admin") {
+    return next();
+  }
+  res.status(403).json({ error: "Forbidden - Admin access required" });
+}
+
 // Hash password helper
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 10);

@@ -4,7 +4,8 @@ import { storage } from "./storage";
 import { resolveChannelId, getChannelInfo, getChannelVideos, getTopVideos } from "./youtube";
 import { z } from "zod";
 import passport from "passport";
-import { hashPassword, requireAuth } from "./auth";
+import { hashPassword, requireAuth, requireAdmin } from "./auth";
+import { insertUserSchema, updateUserSchema, updatePasswordSchema } from "@shared/schema";
 
 const analyzeRequestSchema = z.object({
   channelUrl: z.string(),
@@ -202,6 +203,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const videos = await storage.getVideosByAnalysisId(req.params.id);
       res.json(videos);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // User management routes - admin only
+  app.get("/api/users", requireAdmin, async (req, res) => {
+    try {
+      const allUsers = await storage.getAllUsers();
+      const users = allUsers.map(({ password, ...user }) => user);
+      res.json(users);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/users", requireAdmin, async (req, res) => {
+    try {
+      const { username, password } = insertUserSchema.parse(req.body);
+      
+      const existingUser = await storage.getUserByUsername(username);
+      if (existingUser) {
+        return res.status(400).json({ error: "Username already exists" });
+      }
+
+      const hashedPassword = await hashPassword(password);
+      const user = await storage.createUser({
+        username,
+        password: hashedPassword,
+      });
+
+      const { password: _, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        return res.status(400).json({ error: "Invalid input", details: error.errors });
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/users/:id", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { username } = updateUserSchema.parse(req.body);
+      
+      const existingUser = await storage.getUserByUsername(username);
+      if (existingUser && existingUser.id !== id) {
+        return res.status(400).json({ error: "Username already exists" });
+      }
+
+      const user = await storage.updateUser(id, { username });
+      const { password, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        return res.status(400).json({ error: "Invalid input", details: error.errors });
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/users/:id/password", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { password } = updatePasswordSchema.parse(req.body);
+      
+      const hashedPassword = await hashPassword(password);
+      const user = await storage.updateUserPassword(id, hashedPassword);
+      
+      const { password: _, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        return res.status(400).json({ error: "Invalid input", details: error.errors });
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/users/:id", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      if (req.user?.id === id) {
+        return res.status(400).json({ error: "Cannot delete your own account" });
+      }
+
+      await storage.deleteUser(id);
+      res.json({ message: "User deleted successfully" });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
