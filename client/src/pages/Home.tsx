@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { ChannelInputForm } from "@/components/ChannelInputForm";
 import { Dashboard } from "@/components/Dashboard";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { RecentAnalyses } from "@/components/RecentAnalyses";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -54,6 +56,10 @@ export default function Home() {
   const [analysisData, setAnalysisData] = useState<AnalysisResponse | null>(null);
   const { toast } = useToast();
 
+  const { data: recentAnalyses = [] } = useQuery<any[]>({
+    queryKey: ["/api/analyses"],
+  });
+
   const handleAnalyze = async (url: string) => {
     setIsLoading(true);
     
@@ -81,13 +87,59 @@ export default function Home() {
     setAnalysisData(null);
   };
 
+  const handleSelectAnalysis = async (analysisId: string) => {
+    setIsLoading(true);
+    try {
+      const [analysisResponse, videosResponse] = await Promise.all([
+        apiRequest("GET", `/api/analyses`),
+        apiRequest("GET", `/api/analyses/${analysisId}/videos`)
+      ]);
+
+      const analyses = await analysisResponse.json();
+      const analysis = analyses.find((a: any) => a.id === analysisId);
+      const videos = await videosResponse.json();
+
+      if (!analysis) {
+        throw new Error("Analysis not found");
+      }
+
+      const topVideos = videos.filter((v: any) => v.isTopVideo === 1);
+      const recentVideos = videos.filter((v: any) => v.isTopVideo === 0);
+
+      setAnalysisData({
+        analysis,
+        topVideos,
+        recentVideos,
+      });
+      setShowDashboard(true);
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Failed to Load Analysis",
+        description: error.message || "Could not load the analysis data.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (!analysisData) {
     return (
-      <div className="relative">
+      <div className="min-h-screen">
         <div className="absolute top-4 right-4 z-20">
           <ThemeToggle />
         </div>
         <ChannelInputForm onAnalyze={handleAnalyze} isLoading={isLoading} />
+        
+        {recentAnalyses.length > 0 && (
+          <div className="px-4 md:px-8 py-12">
+            <RecentAnalyses 
+              analyses={recentAnalyses} 
+              onSelect={handleSelectAnalysis}
+              isLoading={isLoading}
+            />
+          </div>
+        )}
       </div>
     );
   }
