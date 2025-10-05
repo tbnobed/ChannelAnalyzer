@@ -1,0 +1,105 @@
+Build a full-stack web app called YouTube Channel Analyzer using React (Vite + Tailwind) and Node/Express.
+The app will take a YouTube channel URL as input, automatically resolve the channelId via YouTube’s Data API, send it to an n8n workflow, and display the returned JSON report (containing AI-generated insights and metrics) in a clean, dashboard-style interface.
+
+ Functional Requirements:
+
+Frontend (React + Tailwind)
+
+A centered card input form where the user pastes a YouTube channel URL.
+
+When submitted, the app extracts the channel ID:
+
+If URL looks like youtube.com/channel/UCxxxx, use that.
+
+If it’s a username (youtube.com/@TBN or /c/), resolve via YouTube API:
+
+GET https://www.googleapis.com/youtube/v3/channels?part=id&forUsername={username}&key=YOUR_API_KEY
+
+
+Then POST to:
+
+https://n8n.obtv.io/webhook-test/analyze-channel
+
+
+with:
+
+{ "channelId": "UCxxxxx" }
+
+
+Show a loading spinner while waiting for results.
+
+On success, render the JSON response in a dashboard layout:
+
+Revenue summary
+
+Engagement rate
+
+Risk level
+
+Subscriber growth chart (using Chart.js)
+
+AI recommendations (in formatted text block)
+
+Backend (Node/Express Proxy)
+
+A /api/analyze route that forwards requests to the n8n endpoint (to handle CORS).
+Example:
+
+app.post("/api/analyze", async (req, res) => {
+  const resp = await fetch("https://n8n.obtv.io/webhook-test/analyze-channel", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(req.body)
+  });
+  const data = await resp.json();
+  res.json(data);
+});
+
+
+Display Results Nicely (React)
+
+Use Tailwind for modern styling.
+
+Use Chart.js for graphs (subscriber projections, etc).
+
+Format large numbers and currency values.
+
+Show sections with cards:
+
+Profitability (e.g., $1,665/mo, margin, MCN share)
+
+Engagement (views, likes, comments per video)
+
+Risk Analysis (Low / Medium / High)
+
+AI Insights (paragraphs of strategy)
+
+Environment Variables (.env)
+
+VITE_YT_API_KEY for YouTube API.
+
+Frontend calls this from import.meta.env.VITE_YT_API_KEY.
+
+Project Commands:
+
+npm install
+
+npm run dev (for Vite frontend)
+
+node index.js (for Express proxy)
+
+Optional Polishing:
+
+Animate cards with Framer Motion.
+
+Add a logo or header.
+
+Display timestamps of when report was generated.
+
+The app’s final behavior:
+
+User enters channel URL → “Analyze”
+
+Fetches channelId → Sends to n8n
+
+Receives JSON → Displays rich report with charts + AI insights
