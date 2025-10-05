@@ -15,6 +15,7 @@ export interface IStorage {
   createChannelAnalysis(analysis: InsertChannelAnalysis): Promise<ChannelAnalysis>;
   getChannelAnalysisByChannelId(channelId: string): Promise<ChannelAnalysis | undefined>;
   getAllChannelAnalyses(): Promise<ChannelAnalysis[]>;
+  deleteChannelAnalysis(id: string): Promise<void>;
   
   createVideo(video: InsertVideo): Promise<Video>;
   createVideos(videos: InsertVideo[]): Promise<Video[]>;
@@ -81,6 +82,11 @@ export class DatabaseStorage implements IStorage {
 
   async getAllChannelAnalyses(): Promise<ChannelAnalysis[]> {
     return db.select().from(channelAnalyses).orderBy(desc(channelAnalyses.createdAt));
+  }
+
+  async deleteChannelAnalysis(id: string): Promise<void> {
+    await db.delete(videos).where(eq(videos.analysisId, id));
+    await db.delete(channelAnalyses).where(eq(channelAnalyses.id, id));
   }
 
   async createVideo(video: InsertVideo): Promise<Video> {

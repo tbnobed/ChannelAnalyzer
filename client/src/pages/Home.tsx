@@ -62,9 +62,30 @@ export default function Home() {
   const { user, logout } = useAuth();
   const [, setLocation] = useLocation();
 
-  const { data: recentAnalyses = [], isLoading: isLoadingAnalyses } = useQuery<any[]>({
+  const { data: recentAnalyses = [], isLoading: isLoadingAnalyses, refetch } = useQuery<any[]>({
     queryKey: ["/api/analyses"],
   });
+
+  const handleDelete = async (analysisId: string) => {
+    try {
+      await apiRequest("DELETE", `/api/analyses/${analysisId}`);
+      refetch();
+      toast({
+        title: "Analysis Deleted",
+        description: "The analysis has been deleted successfully.",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Delete Failed",
+        description: error.message || "Failed to delete analysis.",
+      });
+    }
+  };
+
+  const handleRerun = async (channelUrl: string) => {
+    await handleAnalyze(channelUrl);
+  };
 
   const handleAnalyze = async (url: string) => {
     setIsLoading(true);
@@ -187,6 +208,8 @@ export default function Home() {
             <RecentAnalyses 
               analyses={recentAnalyses} 
               onSelect={handleSelectAnalysis}
+              onDelete={handleDelete}
+              onRerun={handleRerun}
               isLoading={isLoading}
             />
           )}

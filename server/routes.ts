@@ -245,6 +245,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/analyses/:id", requireAuth, async (req, res) => {
+    try {
+      await storage.deleteChannelAnalysis(req.params.id);
+      res.json({ message: "Analysis deleted successfully" });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // User management routes - admin only
   app.get("/api/users", requireAdmin, async (req, res) => {
     try {

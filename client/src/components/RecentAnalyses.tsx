@@ -1,11 +1,13 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Clock, Users, Trash2, RefreshCw } from "lucide-react";
 
 interface Analysis {
   id: string;
   channelName: string;
   channelId: string;
+  channelUrl: string;
   totalSubscribers: number;
   riskLevel: string;
   createdAt: string;
@@ -15,10 +17,12 @@ interface Analysis {
 interface RecentAnalysesProps {
   analyses: Analysis[];
   onSelect: (analysisId: string) => void;
+  onDelete: (analysisId: string) => void;
+  onRerun: (channelUrl: string) => void;
   isLoading: boolean;
 }
 
-export function RecentAnalyses({ analyses, onSelect, isLoading }: RecentAnalysesProps) {
+export function RecentAnalyses({ analyses, onSelect, onDelete, onRerun, isLoading }: RecentAnalysesProps) {
   const formatNumber = (value: number) => {
     if (value >= 1000000) {
       return `${(value / 1000000).toFixed(2)}M`;
@@ -73,13 +77,16 @@ export function RecentAnalyses({ analyses, onSelect, isLoading }: RecentAnalyses
         {analyses.map((analysis) => (
           <Card
             key={analysis.id}
-            className="p-4 hover-elevate active-elevate-2 cursor-pointer transition-all"
-            onClick={() => !isLoading && onSelect(analysis.id)}
+            className="p-4 hover-elevate transition-all"
             data-testid={`card-analysis-${analysis.id}`}
           >
             <div className="space-y-3">
               <div className="flex items-start justify-between gap-2">
-                <h3 className="font-semibold line-clamp-2 leading-snug flex-1" data-testid={`text-channel-${analysis.id}`}>
+                <h3 
+                  className="font-semibold line-clamp-2 leading-snug flex-1 cursor-pointer"
+                  onClick={() => !isLoading && onSelect(analysis.id)}
+                  data-testid={`text-channel-${analysis.id}`}
+                >
                   {analysis.channelName}
                 </h3>
                 <Badge 
@@ -113,6 +120,35 @@ export function RecentAnalyses({ analyses, onSelect, isLoading }: RecentAnalyses
                     ${formatNumber(analysis.monthlyRevenue)}/mo
                   </span>
                 </div>
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRerun(analysis.channelUrl);
+                  }}
+                  disabled={isLoading}
+                  data-testid={`button-rerun-${analysis.id}`}
+                >
+                  <RefreshCw className="h-3 w-3 mr-1" />
+                  Re-run
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(analysis.id);
+                  }}
+                  disabled={isLoading}
+                  data-testid={`button-delete-${analysis.id}`}
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
               </div>
             </div>
           </Card>
