@@ -103,15 +103,11 @@ If you prefer to deploy manually:
 # Build the images
 docker compose build
 
-# Start the services
+# Start the services (migrations will run automatically via init container)
 docker compose up -d
-
-# Wait for database to be ready
-sleep 10
-
-# Run database migrations
-docker compose exec app npm run db:push
 ```
+
+**Note**: Database migrations run automatically via a dedicated init container before the app starts. You don't need to run them manually.
 
 ## Accessing the Application
 
@@ -165,13 +161,15 @@ docker compose restart app
 # Pull latest changes (if using git)
 git pull
 
-# Rebuild and restart
+# Rebuild and restart (migrations will run automatically)
 docker compose down
 docker compose build
 docker compose up -d
+```
 
-# Run migrations if schema changed
-docker compose exec app npm run db:push
+**Note**: Migrations run automatically via the init container on startup. If you need to manually run migrations for troubleshooting, use:
+```bash
+docker compose run --rm migrate
 ```
 
 ### Backup Database

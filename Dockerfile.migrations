@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# Install ALL dependencies (includes drizzle-kit, tsx for TypeScript support)
+# Install ALL dependencies (now includes ts-node in devDependencies)
 RUN npm ci
 
 # Copy necessary files for migrations
@@ -15,5 +15,5 @@ COPY shared ./shared
 COPY drizzle.config.ts ./drizzle.config.ts
 COPY db.ts ./db.ts
 
-# Default command runs migrations (drizzle-kit supports TypeScript natively)
-CMD ["npx", "drizzle-kit", "push", "--force"]
+# Run drizzle-kit directly (it will use ts-node to load the TypeScript config)
+CMD ["npx", "drizzle-kit", "push", "--yes"]
