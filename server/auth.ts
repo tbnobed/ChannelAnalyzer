@@ -18,10 +18,8 @@ declare global {
 }
 
 export function setupAuth(app: Express) {
-  // Trust proxy if behind reverse proxy (nginx, etc)
-  if (process.env.NODE_ENV === "production") {
-    app.set("trust proxy", 1);
-  }
+  // Trust proxy for HTTPS termination (nginx, etc)
+  app.set("trust proxy", 1);
 
   // Session configuration
   const sessionConfig: session.SessionOptions = {
@@ -29,9 +27,10 @@ export function setupAuth(app: Express) {
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false, // Set to true only if using HTTPS
+      secure: true,
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+      sameSite: "lax",
     },
   };
 
