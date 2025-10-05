@@ -14,7 +14,21 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
 });
 
+export const updateUserSchema = z.object({
+  username: z.string().min(3).max(50).trim(),
+});
+
+export const updatePasswordSchema = z.object({
+  password: z.string().min(6),
+  confirmPassword: z.string().min(6),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type UpdateUser = z.infer<typeof updateUserSchema>;
+export type UpdatePassword = z.infer<typeof updatePasswordSchema>;
 export type User = typeof users.$inferSelect;
 
 export const channelAnalyses = pgTable("channel_analyses", {

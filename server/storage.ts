@@ -7,6 +7,10 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  getAllUsers(): Promise<User[]>;
+  updateUser(id: string, updates: Partial<InsertUser>): Promise<User>;
+  updateUserPassword(id: string, hashedPassword: string): Promise<User>;
+  deleteUser(id: string): Promise<void>;
   
   createChannelAnalysis(analysis: InsertChannelAnalysis): Promise<ChannelAnalysis>;
   getChannelAnalysisByChannelId(channelId: string): Promise<ChannelAnalysis | undefined>;
@@ -32,6 +36,32 @@ export class DatabaseStorage implements IStorage {
   async createUser(user: InsertUser): Promise<User> {
     const result = await db.insert(users).values(user).returning();
     return result[0];
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return db.select().from(users);
+  }
+
+  async updateUser(id: string, updates: Partial<InsertUser>): Promise<User> {
+    const result = await db
+      .update(users)
+      .set(updates)
+      .where(eq(users.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async updateUserPassword(id: string, hashedPassword: string): Promise<User> {
+    const result = await db
+      .update(users)
+      .set({ password: hashedPassword })
+      .where(eq(users.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteUser(id: string): Promise<void> {
+    await db.delete(users).where(eq(users.id, id));
   }
 
   async createChannelAnalysis(analysis: InsertChannelAnalysis): Promise<ChannelAnalysis> {
