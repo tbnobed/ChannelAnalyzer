@@ -40,7 +40,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? parseFloat(((avgLikes + avgComments) / avgViews * 100).toFixed(2))
         : 0;
 
-      const n8nResponse = await fetch("https://n8n.obtv.io/webhook-test/analyze-channel", {
+      const n8nResponse = await fetch("https://n8n.obtv.io/webhook/analyze-channel", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ channelId }),
