@@ -255,6 +255,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const user = await storage.updateUser(id, { username });
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
       const { password, ...userWithoutPassword } = user;
       res.json(userWithoutPassword);
     } catch (error: any) {
@@ -272,6 +276,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const hashedPassword = await hashPassword(password);
       const user = await storage.updateUserPassword(id, hashedPassword);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
       
       const { password: _, ...userWithoutPassword } = user;
       res.json(userWithoutPassword);
