@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: yt-analyzer-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ytanalyzer
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ytanalyzer
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ytanalyzer"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: yt-analyzer-app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://ytanalyzer:${DB_PASSWORD}@postgres:5432/ytanalyzer
+      VITE_YT_API_KEY: ${VITE_YT_API_KEY}
+      SESSION_SECRET: ${SESSION_SECRET}
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./migrations:/app/migrations
+
+volumes:
+  postgres_data:
