@@ -111,10 +111,10 @@ export function Dashboard({ channelName, channelId, data, topVideos = [], recent
           <MetricCard
             title="Total Subscribers"
             value={formatNumber(data.subscribers.current)}
-            subtitle="Current subscriber count"
+            subtitle={`Growth projection: ${data.subscribers.growth}`}
             trend={{
               value: data.subscribers.growth,
-              isPositive: true,
+              isPositive: data.subscribers.growth.startsWith('+') || !data.subscribers.growth.startsWith('-'),
             }}
           />
         </div>

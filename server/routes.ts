@@ -131,6 +131,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error("Error calling n8n webhook:", error);
       }
 
+      // Extract subscriber growth projections from AI insights
+      let subscriberGrowth = n8nData.subscriberGrowth ?? "+0%";
+      let subscriberChartData = n8nData.subscriberChartData ?? [channelInfo.subscriberCount];
+      let subscriberChartLabels = n8nData.subscriberChartLabels ?? ["Current"];
+      
+      if (n8nData.aiInsights) {
+        // Try to extract growth projections from AI insights
+        const projectionsMatch = n8nData.aiInsights.match(/Expected to reach approximately ([\d,]+) in 3 months, ([\d,]+) in 6 months, and ([\d,]+) in 12 months/);
+        
+        if (projectionsMatch) {
+          const threeMonthSubs = parseInt(projectionsMatch[1].replace(/,/g, ''));
+          const sixMonthSubs = parseInt(projectionsMatch[2].replace(/,/g, ''));
+          const twelveMonthSubs = parseInt(projectionsMatch[3].replace(/,/g, ''));
+          
+          // Calculate 12-month growth percentage
+          const growthPercent = ((twelveMonthSubs - channelInfo.subscriberCount) / channelInfo.subscriberCount * 100).toFixed(1);
+          subscriberGrowth = `+${growthPercent}% (12mo)`;
+          
+          // Create chart data with projections
+          subscriberChartData = [
+            channelInfo.subscriberCount,
+            threeMonthSubs,
+            sixMonthSubs,
+            twelveMonthSubs
+          ];
+          subscriberChartLabels = ["Current", "3 months", "6 months", "12 months"];
+        }
+      }
+
       const analysisData = {
         channelId,
         channelName: channelInfo.title,
@@ -144,9 +173,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         engagementRate,
         riskLevel: n8nData.riskAnalysis?.riskAnalysis?.level?.toLowerCase() ?? "unknown",
         totalSubscribers: channelInfo.subscriberCount,
-        subscriberGrowth: n8nData.subscriberGrowth ?? "+0%",
-        subscriberChartData: n8nData.subscriberChartData ?? [channelInfo.subscriberCount],
-        subscriberChartLabels: n8nData.subscriberChartLabels ?? ["Current"],
+        subscriberGrowth,
+        subscriberChartData,
+        subscriberChartLabels,
         aiInsights: n8nData.aiInsights ?? "Analysis complete.",
       };
 
