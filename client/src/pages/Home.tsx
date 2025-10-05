@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { ChannelInputForm } from "@/components/ChannelInputForm";
 import { Dashboard } from "@/components/Dashboard";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -8,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { LogOut, Users } from "lucide-react";
 
 interface AnalysisResponse {
   analysis: {
@@ -59,6 +60,7 @@ export default function Home() {
   const [analysisData, setAnalysisData] = useState<AnalysisResponse | null>(null);
   const { toast } = useToast();
   const { user, logout } = useAuth();
+  const [, setLocation] = useLocation();
 
   const { data: recentAnalyses = [], isLoading: isLoadingAnalyses } = useQuery<any[]>({
     queryKey: ["/api/analyses"],
@@ -146,6 +148,16 @@ export default function Home() {
           <div className="text-sm text-muted-foreground mr-2">
             {user?.username}
           </div>
+          {user?.username === "admin" && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setLocation("/users")}
+              data-testid="button-users"
+            >
+              <Users className="h-4 w-4" />
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="sm"

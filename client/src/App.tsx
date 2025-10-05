@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import Home from "@/pages/Home";
 import Login from "@/pages/Login";
+import Users from "@/pages/Users";
 import NotFound from "@/pages/not-found";
 
 function ProtectedRoute({ component: Component }: { component: () => JSX.Element }) {
@@ -27,6 +28,28 @@ function ProtectedRoute({ component: Component }: { component: () => JSX.Element
   return <Component />;
 }
 
+function AdminRoute({ component: Component }: { component: () => JSX.Element }) {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Redirect to="/login" />;
+  }
+
+  if (user.username !== "admin") {
+    return <Redirect to="/" />;
+  }
+
+  return <Component />;
+}
+
 function Router() {
   const { user, isLoading } = useAuth();
 
@@ -42,6 +65,9 @@ function Router() {
     <Switch>
       <Route path="/login">
         {user ? <Redirect to="/" /> : <Login />}
+      </Route>
+      <Route path="/users">
+        <AdminRoute component={Users} />
       </Route>
       <Route path="/">
         <ProtectedRoute component={Home} />
