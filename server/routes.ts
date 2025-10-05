@@ -9,6 +9,16 @@ const analyzeRequestSchema = z.object({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  app.get("/api/health", async (req, res) => {
+    try {
+      // Test database connection
+      await storage.getAllChannelAnalyses();
+      res.json({ status: "ok", timestamp: new Date().toISOString() });
+    } catch (error: any) {
+      res.status(503).json({ status: "error", message: error.message });
+    }
+  });
+
   app.post("/api/analyze", async (req, res) => {
     try {
       const { channelUrl } = analyzeRequestSchema.parse(req.body);

@@ -20,7 +20,7 @@ export function AIInsights({ insights }: AIInsightsProps) {
         </div>
       </div>
 
-      <div className="prose prose-sm max-w-none" data-testid="text-ai-insights">
+      <div className="prose prose-sm max-w-none max-h-96 overflow-y-auto" data-testid="text-ai-insights">
         <div className="text-foreground whitespace-pre-wrap leading-relaxed">
           {insights}
         </div>
