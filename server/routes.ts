@@ -46,24 +46,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         body: JSON.stringify({ channelId }),
       });
       const n8nData = await n8nResponse.json();
+      console.log("n8n webhook response:", JSON.stringify(n8nData, null, 2));
 
       const analysisData = {
         channelId,
         channelName: channelInfo.title,
         channelUrl,
-        monthlyRevenue: n8nData.revenue?.monthly || 1665,
-        profitMargin: n8nData.revenue?.margin || 42.5,
-        mcnShare: n8nData.revenue?.mcnShare || 15,
+        monthlyRevenue: n8nData.revenue?.monthly ?? n8nData.monthlyRevenue ?? 1665,
+        profitMargin: n8nData.revenue?.margin ?? n8nData.profitMargin ?? 42.5,
+        mcnShare: n8nData.revenue?.mcnShare ?? n8nData.mcnShare ?? 15,
         avgViews,
         avgLikes,
         avgComments,
         engagementRate,
-        riskLevel: n8nData.risk || "low",
+        riskLevel: n8nData.risk ?? n8nData.riskLevel ?? "low",
         totalSubscribers: channelInfo.subscriberCount,
-        subscriberGrowth: n8nData.subscribers?.growth || "+15.3%",
-        subscriberChartData: n8nData.subscribers?.chartData || [950000, 980000, 1020000, 1100000, 1180000, channelInfo.subscriberCount],
-        subscriberChartLabels: n8nData.subscribers?.chartLabels || ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-        aiInsights: n8nData.aiInsights || "Analysis complete. Channel shows strong engagement metrics.",
+        subscriberGrowth: n8nData.subscribers?.growth ?? n8nData.subscriberGrowth ?? "+15.3%",
+        subscriberChartData: n8nData.subscribers?.chartData ?? n8nData.subscriberChartData ?? [950000, 980000, 1020000, 1100000, 1180000, channelInfo.subscriberCount],
+        subscriberChartLabels: n8nData.subscribers?.chartLabels ?? n8nData.subscriberChartLabels ?? ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+        aiInsights: n8nData.aiInsights ?? n8nData.insights ?? "Analysis complete. Channel shows strong engagement metrics.",
       };
 
       const analysis = await storage.createChannelAnalysis(analysisData);
