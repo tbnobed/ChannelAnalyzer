@@ -131,32 +131,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error("Error calling n8n webhook:", error);
       }
 
-      // Extract subscriber growth projections from AI insights
-      let subscriberGrowth = n8nData.subscriberGrowth ?? "+0%";
-      let subscriberChartData = n8nData.subscriberChartData ?? [channelInfo.subscriberCount];
-      let subscriberChartLabels = n8nData.subscriberChartLabels ?? ["Current"];
+      // Extract subscriber growth projections from structured data
+      let subscriberGrowth = "+0%";
+      let subscriberChartData = [channelInfo.subscriberCount];
+      let subscriberChartLabels = ["Current"];
       
-      if (n8nData.aiInsights) {
-        // Try to extract growth projections from AI insights
-        const projectionsMatch = n8nData.aiInsights.match(/Expected to reach approximately ([\d,]+) in 3 months, ([\d,]+) in 6 months, and ([\d,]+) in 12 months/);
+      if (n8nData.projections && n8nData.projections.subs12) {
+        const threeMonthSubs = n8nData.projections.subs3;
+        const sixMonthSubs = n8nData.projections.subs6;
+        const twelveMonthSubs = n8nData.projections.subs12;
         
-        if (projectionsMatch) {
-          const threeMonthSubs = parseInt(projectionsMatch[1].replace(/,/g, ''));
-          const sixMonthSubs = parseInt(projectionsMatch[2].replace(/,/g, ''));
-          const twelveMonthSubs = parseInt(projectionsMatch[3].replace(/,/g, ''));
-          
-          // Calculate 12-month growth percentage
-          const growthPercent = ((twelveMonthSubs - channelInfo.subscriberCount) / channelInfo.subscriberCount * 100).toFixed(1);
-          subscriberGrowth = `+${growthPercent}% (12mo)`;
-          
-          // Create chart data with projections
-          subscriberChartData = [
-            channelInfo.subscriberCount,
-            threeMonthSubs,
-            sixMonthSubs,
-            twelveMonthSubs
-          ];
-          subscriberChartLabels = ["Current", "3 months", "6 months", "12 months"];
+        // Calculate 12-month growth percentage
+        const growthPercent = ((twelveMonthSubs - channelInfo.subscriberCount) / channelInfo.subscriberCount * 100).toFixed(1);
+        subscriberGrowth = `+${growthPercent}% (12mo)`;
+        
+        // Create chart data with projections
+        subscriberChartData = [
+          channelInfo.subscriberCount,
+          threeMonthSubs,
+          sixMonthSubs,
+          twelveMonthSubs
+        ];
+        subscriberChartLabels = ["Current", "3 months", "6 months", "12 months"];
+      }
+      
+      // Handle aiInsights - can be string or object
+      let aiInsightsText = "Analysis complete.";
+      if (n8nData.aiInsights) {
+        if (typeof n8nData.aiInsights === 'string') {
+          aiInsightsText = n8nData.aiInsights;
+        } else if (n8nData.aiInsights.summary) {
+          aiInsightsText = n8nData.aiInsights.summary;
+          if (n8nData.aiInsights.recommendations && Array.isArray(n8nData.aiInsights.recommendations)) {
+            aiInsightsText += "\n\n### Recommendations\n" + n8nData.aiInsights.recommendations.join("\n");
+          }
         }
       }
 
@@ -164,19 +172,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         channelId,
         channelName: channelInfo.title,
         channelUrl,
-        monthlyRevenue: n8nData.profitability?.profitability?.estMonthlyRevenue ?? 0,
-        profitMargin: n8nData.profitability?.profitability?.marginPercent ?? 0,
-        mcnShare: parseInt(n8nData.profitability?.profitability?.mcnSharePercent) || 0,
+        monthlyRevenue: n8nData.profitability?.estMonthlyRevenue ?? 0,
+        profitMargin: n8nData.profitability?.marginPercent ?? 0,
+        mcnShare: parseInt(n8nData.profitability?.mcnSharePercent) || 0,
         avgViews,
         avgLikes,
         avgComments,
         engagementRate,
-        riskLevel: n8nData.riskAnalysis?.riskAnalysis?.level?.toLowerCase() ?? "unknown",
+        riskLevel: n8nData.riskAnalysis?.level?.toLowerCase() ?? "unknown",
         totalSubscribers: channelInfo.subscriberCount,
         subscriberGrowth,
         subscriberChartData,
         subscriberChartLabels,
-        aiInsights: n8nData.aiInsights ?? "Analysis complete.",
+        aiInsights: aiInsightsText,
       };
 
       const analysis = await storage.createChannelAnalysis(analysisData);
