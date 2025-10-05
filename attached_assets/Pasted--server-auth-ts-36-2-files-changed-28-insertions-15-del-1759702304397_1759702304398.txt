@@ -1,0 +1,81 @@
+ server/auth.ts | 36 ++++++++++++++++++++++++------------
+ 2 files changed, 28 insertions(+), 15 deletions(-)
+obtv-admin@yt-analyzer:~/ChannelAnalyzer$ docker compose build
+WARN[0000] /home/obtv-admin/ChannelAnalyzer/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion 
+[+] Building 11.4s (28/28) FINISHED                                                                                                                                                                                                                                                                 
+ => [internal] load local bake definitions                                                                                                                                                                                                                                                     0.0s
+ => => reading from stdin 982B                                                                                                                                                                                                                                                                 0.0s
+ => [app internal] load build definition from Dockerfile                                                                                                                                                                                                                                       0.0s
+ => => transferring dockerfile: 873B                                                                                                                                                                                                                                                           0.0s
+ => [migrate internal] load build definition from Dockerfile.migrations                                                                                                                                                                                                                        0.0s
+ => => transferring dockerfile: 519B                                                                                                                                                                                                                                                           0.0s
+ => [migrate internal] load metadata for docker.io/library/node:20-alpine                                                                                                                                                                                                                      0.5s
+ => [migrate internal] load .dockerignore                                                                                                                                                                                                                                                      0.0s
+ => => transferring context: 179B                                                                                                                                                                                                                                                              0.0s
+ => [migrate internal] load build context                                                                                                                                                                                                                                                      0.0s
+ => => transferring context: 1.18kB                                                                                                                                                                                                                                                            0.0s
+ => [migrate 1/8] FROM docker.io/library/node:20-alpine@sha256:eabac870db94f7342d6c33560d6613f188bbcf4bbe1f4eb47d5e2a08e1a37722                                                                                                                                                                0.0s
+ => [app internal] load build context                                                                                                                                                                                                                                                          0.0s
+ => => transferring context: 11.18kB                                                                                                                                                                                                                                                           0.0s
+ => CACHED [app 2/8] WORKDIR /app                                                                                                                                                                                                                                                              0.0s
+ => CACHED [migrate 3/8] COPY package*.json ./                                                                                                                                                                                                                                                 0.0s
+ => CACHED [migrate 4/8] COPY tsconfig.json ./                                                                                                                                                                                                                                                 0.0s
+ => CACHED [migrate 5/8] RUN npm ci                                                                                                                                                                                                                                                            0.0s
+ => CACHED [migrate 6/8] COPY shared ./shared                                                                                                                                                                                                                                                  0.0s
+ => CACHED [migrate 7/8] COPY drizzle.config.ts ./drizzle.config.ts                                                                                                                                                                                                                            0.0s
+ => [migrate 8/8] COPY db.ts ./db.ts                                                                                                                                                                                                                                                           0.0s
+ => CACHED [app builder 3/7] COPY package*.json ./                                                                                                                                                                                                                                             0.0s
+ => CACHED [app builder 4/7] RUN npm ci                                                                                                                                                                                                                                                        0.0s
+ => [app builder 5/7] COPY . .                                                                                                                                                                                                                                                                 0.0s
+ => [migrate] exporting to image                                                                                                                                                                                                                                                               0.0s
+ => => exporting layers                                                                                                                                                                                                                                                                        0.0s
+ => => writing image sha256:f5b0b4c2558349aea6b8d97809e6fd5d4794b650f48c48bde22dcc0dd474aec3                                                                                                                                                                                                   0.0s
+ => => naming to docker.io/library/channelanalyzer-migrate                                                                                                                                                                                                                                     0.0s
+ => [app builder 6/7] RUN npm run build                                                                                                                                                                                                                                                        8.9s
+ => [migrate] resolving provenance for metadata file                                                                                                                                                                                                                                           0.0s
+ => [app builder 7/7] RUN npx esbuild server/production.ts --platform=node --packages=external --bundle --format=esm --outdir=dist                                                                                                                                                             1.0s
+ => CACHED [app stage-1 4/7] RUN npm ci --only=production                                                                                                                                                                                                                                      0.0s 
+ => [app stage-1 5/7] COPY --from=builder /app/dist ./dist                                                                                                                                                                                                                                     0.0s 
+ => [app stage-1 6/7] COPY --from=builder /app/shared ./shared                                                                                                                                                                                                                                 0.0s 
+ => [app stage-1 7/7] RUN addgroup -g 1001 -S nodejs &&     adduser -S nodejs -u 1001                                                                                                                                                                                                          0.2s 
+ => [app] exporting to image                                                                                                                                                                                                                                                                   0.0s 
+ => => exporting layers                                                                                                                                                                                                                                                                        0.0s
+ => => writing image sha256:7f51238d814af081c8c88a32114e267ed033938de298efcc36f0fd9056a4de6b                                                                                                                                                                                                   0.0s
+ => => naming to docker.io/library/channelanalyzer-app                                                                                                                                                                                                                                         0.0s
+ => [app] resolving provenance for metadata file                                                                                                                                                                                                                                               0.0s
+[+] Building 2/2
+ ✔ channelanalyzer-app      Built                                                                                                                                                                                                                                                              0.0s 
+ ✔ channelanalyzer-migrate  Built                                                                                                                                                                                                                                                              0.0s 
+obtv-admin@yt-analyzer:~/ChannelAnalyzer$ docker compose up
+WARN[0000] /home/obtv-admin/ChannelAnalyzer/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion 
+[+] Running 4/4
+ ✔ Network channelanalyzer_default  Created                                                                                                                                                                                                                                                    0.0s 
+ ✔ Container yt-analyzer-db         Created                                                                                                                                                                                                                                                    0.0s 
+ ✔ Container yt-analyzer-migrate    Created                                                                                                                                                                                                                                                    0.0s 
+ ✔ Container yt-analyzer-app        Created                                                                                                                                                                                                                                                    0.0s 
+Attaching to yt-analyzer-app, yt-analyzer-db, yt-analyzer-migrate
+yt-analyzer-db  | 
+yt-analyzer-db  | PostgreSQL Database directory appears to contain a database; Skipping initialization
+yt-analyzer-db  | 
+yt-analyzer-db  | 2025-10-05 22:09:35.001 UTC [1] LOG:  starting PostgreSQL 16.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 14.2.0) 14.2.0, 64-bit
+yt-analyzer-db  | 2025-10-05 22:09:35.001 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+yt-analyzer-db  | 2025-10-05 22:09:35.001 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+yt-analyzer-db  | 2025-10-05 22:09:35.002 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+yt-analyzer-db  | 2025-10-05 22:09:35.006 UTC [29] LOG:  database system was shut down at 2025-10-05 22:05:15 UTC
+yt-analyzer-db  | 2025-10-05 22:09:35.013 UTC [1] LOG:  database system is ready to accept connections
+yt-analyzer-migrate  | No config path provided, using default 'drizzle.config.ts'
+yt-analyzer-migrate  | Reading config file '/app/drizzle.config.ts'
+yt-analyzer-migrate  | Using 'pg' driver for database querying
+yt-analyzer-migrate  | [⣷] Pulling schema from database...
+[⣯] Pulling schema from database...
+[✓] Pulling schema from database...
+yt-analyzer-migrate  | [i] No changes detected
+yt-analyzer-migrate exited with code 0
+yt-analyzer-app      | ✓ Admin account already exists
+yt-analyzer-app      | Production server running on port 5000
+yt-analyzer-app      | GET /api/auth/me 401 in 2ms :: {"error":"Not authenticated"}
+yt-analyzer-app      | POST /api/auth/login 200 in 164ms :: {"user":{"id":"87bc7cf6-89f0-4d0b-9841-628…
+yt-analyzer-app      | GET /api/analyses 401 in 1ms :: {"error":"Unauthorized"}
+yt-analyzer-app      | POST /api/analyze 401 in 2ms :: {"error":"Unauthorized"}
+yt-analyzer-app      | GET /api/auth/me 401 in 1ms :: {"error":"Not authenticated"}
+yt-analyzer-app      | GET /api/auth/me 401 in 1ms :: {"error":"Not authenticated"}

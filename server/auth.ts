@@ -18,13 +18,18 @@ declare global {
 }
 
 export function setupAuth(app: Express) {
+  // Trust proxy if behind reverse proxy (nginx, etc)
+  if (process.env.NODE_ENV === "production") {
+    app.set("trust proxy", 1);
+  }
+
   // Session configuration
   const sessionConfig: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || "youtube-analyzer-secret-key-change-in-production",
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === "production",
+      secure: false, // Set to true only if using HTTPS
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
     },
