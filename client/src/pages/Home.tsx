@@ -2,55 +2,119 @@ import { useState } from "react";
 import { ChannelInputForm } from "@/components/ChannelInputForm";
 import { Dashboard } from "@/components/Dashboard";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+
+interface AnalysisResponse {
+  analysis: {
+    id: string;
+    channelId: string;
+    channelName: string;
+    channelUrl: string;
+    monthlyRevenue: number;
+    profitMargin: number;
+    mcnShare: number;
+    avgViews: number;
+    avgLikes: number;
+    avgComments: number;
+    engagementRate: number;
+    riskLevel: string;
+    totalSubscribers: number;
+    subscriberGrowth: string;
+    subscriberChartData: number[];
+    subscriberChartLabels: string[];
+    aiInsights: string;
+    createdAt: string;
+  };
+  topVideos: Array<{
+    id: string;
+    videoId: string;
+    title: string;
+    thumbnail: string;
+    publishedAt: string;
+    viewCount: number;
+    likeCount: number;
+    commentCount: number;
+  }>;
+  recentVideos: Array<{
+    id: string;
+    videoId: string;
+    title: string;
+    thumbnail: string;
+    publishedAt: string;
+    viewCount: number;
+    likeCount: number;
+    commentCount: number;
+  }>;
+}
 
 export default function Home() {
   const [showDashboard, setShowDashboard] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [analysisData, setAnalysisData] = useState<AnalysisResponse | null>(null);
+  const { toast } = useToast();
 
-  const handleAnalyze = (url: string) => {
-    console.log("Analyzing channel:", url);
+  const handleAnalyze = async (url: string) => {
     setIsLoading(true);
     
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const response = await apiRequest("POST", "/api/analyze", {
+        channelUrl: url,
+      });
+
+      const data = await response.json() as AnalysisResponse;
+      setAnalysisData(data);
       setShowDashboard(true);
-    }, 1500);
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Analysis Failed",
+        description: error.message || "Failed to analyze channel. Please check the URL and try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleBack = () => {
     setShowDashboard(false);
+    setAnalysisData(null);
   };
 
-  const mockData = {
+  if (!analysisData) {
+    return (
+      <div className="relative">
+        <div className="absolute top-4 right-4 z-20">
+          <ThemeToggle />
+        </div>
+        <ChannelInputForm onAnalyze={handleAnalyze} isLoading={isLoading} />
+      </div>
+    );
+  }
+
+  const { analysis, topVideos, recentVideos } = analysisData;
+
+  const dashboardData = {
     revenue: {
-      monthly: 1665,
-      margin: 42.5,
-      mcnShare: 15,
+      monthly: analysis.monthlyRevenue || 0,
+      margin: analysis.profitMargin || 0,
+      mcnShare: analysis.mcnShare || 0,
     },
     engagement: {
-      views: 125000,
-      likes: 8500,
-      comments: 432,
-      rate: 7.2,
+      views: analysis.avgViews || 0,
+      likes: analysis.avgLikes || 0,
+      comments: analysis.avgComments || 0,
+      rate: analysis.engagementRate || 0,
     },
-    risk: "low" as const,
+    risk: (analysis.riskLevel || "low") as "low" | "medium" | "high",
     subscribers: {
-      current: 1200000,
-      growth: "15.3%",
-      chartData: [950000, 980000, 1020000, 1100000, 1180000, 1200000],
-      chartLabels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+      current: analysis.totalSubscribers || 0,
+      growth: analysis.subscriberGrowth || "+0%",
+      chartData: analysis.subscriberChartData || [],
+      chartLabels: analysis.subscriberChartLabels || [],
     },
-    aiInsights: `Content Strategy Analysis:
-The channel demonstrates strong consistency in upload schedule and content quality. Engagement rates are above industry average, indicating high audience retention and satisfaction.
-
-Growth Opportunities:
-• Expand into trending topics within your niche to capture new audiences
-• Increase collaboration with similar-sized channels for cross-promotion
-• Implement stronger CTAs in video descriptions to boost subscriber conversion
-
-Revenue Optimization:
-Current monetization strategy is solid, but there's potential to diversify income streams. Consider merchandise, memberships, or sponsored content partnerships to supplement ad revenue.`,
-    timestamp: new Date().toLocaleString("en-US", {
+    aiInsights: analysis.aiInsights || "No insights available.",
+    timestamp: new Date(analysis.createdAt).toLocaleString("en-US", {
       month: "long",
       day: "numeric",
       year: "numeric",
@@ -60,23 +124,13 @@ Current monetization strategy is solid, but there's potential to diversify incom
   };
 
   return (
-    <div className="relative">
-      {!showDashboard && (
-        <div className="absolute top-4 right-4 z-20">
-          <ThemeToggle />
-        </div>
-      )}
-
-      {showDashboard ? (
-        <Dashboard
-          channelName="Tech Reviews Pro"
-          channelId="UCxxxxxxxxxxxxx"
-          data={mockData}
-          onBack={handleBack}
-        />
-      ) : (
-        <ChannelInputForm onAnalyze={handleAnalyze} isLoading={isLoading} />
-      )}
-    </div>
+    <Dashboard
+      channelName={analysis.channelName}
+      channelId={analysis.channelId}
+      data={dashboardData}
+      topVideos={topVideos}
+      recentVideos={recentVideos}
+      onBack={handleBack}
+    />
   );
 }

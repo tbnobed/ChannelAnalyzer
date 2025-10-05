@@ -4,8 +4,20 @@ import { EngagementCard } from "./EngagementCard";
 import { RiskBadge } from "./RiskBadge";
 import { SubscriberChart } from "./SubscriberChart";
 import { AIInsights } from "./AIInsights";
+import { VideosSection } from "./VideosSection";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar } from "lucide-react";
+
+interface Video {
+  id: string;
+  videoId: string;
+  title: string;
+  thumbnail: string;
+  publishedAt: string;
+  viewCount: number;
+  likeCount: number;
+  commentCount: number;
+}
 
 interface DashboardProps {
   channelName: string;
@@ -32,10 +44,12 @@ interface DashboardProps {
     aiInsights: string;
     timestamp: string;
   };
+  topVideos?: Video[];
+  recentVideos?: Video[];
   onBack: () => void;
 }
 
-export function Dashboard({ channelName, channelId, data, onBack }: DashboardProps) {
+export function Dashboard({ channelName, channelId, data, topVideos = [], recentVideos = [], onBack }: DashboardProps) {
   const formatNumber = (value: number) => {
     if (value >= 1000000) {
       return `${(value / 1000000).toFixed(2)}M`;
@@ -117,6 +131,26 @@ export function Dashboard({ channelName, channelId, data, onBack }: DashboardPro
             <AIInsights insights={data.aiInsights} />
           </div>
         </div>
+
+        {topVideos.length > 0 && (
+          <div className="mt-8">
+            <VideosSection
+              title="Top Performing Videos"
+              videos={topVideos}
+              emptyMessage="No top videos available"
+            />
+          </div>
+        )}
+
+        {recentVideos.length > 0 && (
+          <div className="mt-8">
+            <VideosSection
+              title="Recent Videos"
+              videos={recentVideos}
+              emptyMessage="No recent videos available"
+            />
+          </div>
+        )}
       </div>
     </div>
   );
