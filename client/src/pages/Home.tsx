@@ -131,23 +131,27 @@ export default function Home() {
         </div>
         <ChannelInputForm onAnalyze={handleAnalyze} isLoading={isLoading} />
         
-        {!isLoadingAnalyses && recentAnalyses.length > 0 && (
-          <div className="px-4 md:px-8 py-12">
+        <div className="px-4 md:px-8 pb-12">
+          {isLoadingAnalyses && (
+            <div className="text-center text-muted-foreground">
+              Loading recent analyses...
+            </div>
+          )}
+          
+          {!isLoadingAnalyses && recentAnalyses.length === 0 && (
+            <div className="text-center text-muted-foreground">
+              No recent analyses. Analyze a channel to get started!
+            </div>
+          )}
+          
+          {!isLoadingAnalyses && recentAnalyses.length > 0 && (
             <RecentAnalyses 
               analyses={recentAnalyses} 
               onSelect={handleSelectAnalysis}
               isLoading={isLoading}
             />
-          </div>
-        )}
-        
-        {isLoadingAnalyses && (
-          <div className="px-4 md:px-8 py-12">
-            <div className="text-center text-muted-foreground">
-              Loading recent analyses...
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     );
   }

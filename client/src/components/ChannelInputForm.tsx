@@ -20,18 +20,18 @@ export function ChannelInputForm({ onAnalyze, isLoading = false }: ChannelInputF
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-16">
-      <div className="w-full max-w-2xl space-y-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl md:text-5xl font-bold">
+    <div className="flex justify-center px-4 py-12">
+      <div className="w-full max-w-2xl space-y-6">
+        <div className="text-center space-y-3">
+          <h1 className="text-3xl md:text-4xl font-bold">
             YouTube Channel Analyzer
           </h1>
-          <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+          <p className="text-base text-muted-foreground max-w-xl mx-auto">
             Get AI-powered insights, revenue estimates, and growth predictions for any YouTube channel
           </p>
         </div>
 
-        <Card className="p-6 md:p-8">
+        <Card className="p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="channel-url" className="text-sm font-medium">
