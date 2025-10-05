@@ -6,6 +6,9 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { RecentAnalyses } from "@/components/RecentAnalyses";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
+import { LogOut } from "lucide-react";
 
 interface AnalysisResponse {
   analysis: {
@@ -55,6 +58,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [analysisData, setAnalysisData] = useState<AnalysisResponse | null>(null);
   const { toast } = useToast();
+  const { user, logout } = useAuth();
 
   const { data: recentAnalyses = [], isLoading: isLoadingAnalyses } = useQuery<any[]>({
     queryKey: ["/api/analyses"],
@@ -123,10 +127,33 @@ export default function Home() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Logout Failed",
+        description: error.message || "Failed to logout",
+      });
+    }
+  };
+
   if (!analysisData) {
     return (
       <div className="min-h-screen">
-        <div className="absolute top-4 right-4 z-20">
+        <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+          <div className="text-sm text-muted-foreground mr-2">
+            {user?.username}
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLogout}
+            data-testid="button-logout"
+          >
+            <LogOut className="h-4 w-4" />
+          </Button>
           <ThemeToggle />
         </div>
         <ChannelInputForm onAnalyze={handleAnalyze} isLoading={isLoading} />

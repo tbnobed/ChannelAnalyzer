@@ -3,12 +3,94 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { resolveChannelId, getChannelInfo, getChannelVideos, getTopVideos } from "./youtube";
 import { z } from "zod";
+import passport from "passport";
+import { hashPassword, requireAuth } from "./auth";
 
 const analyzeRequestSchema = z.object({
   channelUrl: z.string(),
 });
 
+const registerSchema = z.object({
+  username: z.string().min(3).max(50),
+  password: z.string().min(6),
+});
+
+const loginSchema = z.object({
+  username: z.string(),
+  password: z.string(),
+});
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Auth routes
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const { username, password } = registerSchema.parse(req.body);
+      
+      const existingUser = await storage.getUserByUsername(username);
+      if (existingUser) {
+        return res.status(400).json({ error: "Username already exists" });
+      }
+
+      const hashedPassword = await hashPassword(password);
+      const user = await storage.createUser({
+        username,
+        password: hashedPassword,
+      });
+
+      req.login({ id: user.id, username: user.username }, (err) => {
+        if (err) {
+          return res.status(500).json({ error: "Failed to login after registration" });
+        }
+        res.json({ user: { id: user.id, username: user.username } });
+      });
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        return res.status(400).json({ error: "Invalid input", details: error.errors });
+      }
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/auth/login", (req, res, next) => {
+    try {
+      loginSchema.parse(req.body);
+    } catch (error: any) {
+      return res.status(400).json({ error: "Invalid input", details: error.errors });
+    }
+
+    passport.authenticate("local", (err: any, user: Express.User | false, info: any) => {
+      if (err) {
+        return res.status(500).json({ error: "Authentication error" });
+      }
+      if (!user) {
+        return res.status(401).json({ error: info?.message || "Invalid credentials" });
+      }
+      req.login(user, (err) => {
+        if (err) {
+          return res.status(500).json({ error: "Failed to login" });
+        }
+        res.json({ user: { id: user.id, username: user.username } });
+      });
+    })(req, res, next);
+  });
+
+  app.post("/api/auth/logout", (req, res) => {
+    req.logout((err) => {
+      if (err) {
+        return res.status(500).json({ error: "Failed to logout" });
+      }
+      res.json({ message: "Logged out successfully" });
+    });
+  });
+
+  app.get("/api/auth/me", (req, res) => {
+    if (req.isAuthenticated() && req.user) {
+      res.json({ user: req.user });
+    } else {
+      res.status(401).json({ error: "Not authenticated" });
+    }
+  });
+
   app.get("/api/health", async (req, res) => {
     try {
       // Test database connection
@@ -19,7 +101,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/analyze", async (req, res) => {
+  // Protected routes - require authentication
+  app.post("/api/analyze", requireAuth, async (req, res) => {
     try {
       const { channelUrl } = analyzeRequestSchema.parse(req.body);
       const apiKey = process.env.VITE_YT_API_KEY;
@@ -140,7 +223,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/analyses", async (req, res) => {
+  app.get("/api/analyses", requireAuth, async (req, res) => {
     try {
       const analyses = await storage.getAllChannelAnalyses();
       res.json(analyses);
@@ -149,7 +232,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/analyses/:id/videos", async (req, res) => {
+  app.get("/api/analyses/:id/videos", requireAuth, async (req, res) => {
     try {
       const videos = await storage.getVideosByAnalysisId(req.params.id);
       res.json(videos);
