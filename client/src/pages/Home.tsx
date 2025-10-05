@@ -6,7 +6,7 @@ import { Dashboard } from "@/components/Dashboard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { RecentAnalyses } from "@/components/RecentAnalyses";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { LogOut, Users } from "lucide-react";
@@ -62,14 +62,14 @@ export default function Home() {
   const { user, logout } = useAuth();
   const [, setLocation] = useLocation();
 
-  const { data: recentAnalyses = [], isLoading: isLoadingAnalyses, refetch } = useQuery<any[]>({
+  const { data: recentAnalyses = [], isLoading: isLoadingAnalyses } = useQuery<any[]>({
     queryKey: ["/api/analyses"],
   });
 
   const handleDelete = async (analysisId: string) => {
     try {
       await apiRequest("DELETE", `/api/analyses/${analysisId}`);
-      refetch();
+      await queryClient.invalidateQueries({ queryKey: ["/api/analyses"] });
       toast({
         title: "Analysis Deleted",
         description: "The analysis has been deleted successfully.",
