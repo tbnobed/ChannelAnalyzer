@@ -47,22 +47,13 @@ echo "✅ Environment variables configured"
 # Build Docker images
 echo ""
 echo "🔨 Building Docker images..."
-docker-compose build
+docker compose build
 
-# Start services
+# Start services (migrations will run automatically via init container)
 echo ""
 echo "🚀 Starting services..."
-docker-compose up -d
-
-# Wait for database to be ready
-echo ""
-echo "⏳ Waiting for database to be ready..."
-sleep 5
-
-# Run database migrations
-echo ""
-echo "📊 Running database migrations..."
-docker-compose exec app npm run db:push
+echo "   Database migrations will run automatically..."
+docker compose up -d
 
 echo ""
 echo "✅ Deployment complete!"
@@ -75,6 +66,6 @@ echo "   Password: admin123"
 echo ""
 echo "⚠️  IMPORTANT: Change the admin password after first login!"
 echo ""
-echo "To view logs: docker-compose logs -f"
-echo "To stop: docker-compose down"
-echo "To restart: docker-compose restart"
+echo "To view logs: docker compose logs -f"
+echo "To stop: docker compose down"
+echo "To restart: docker compose restart"

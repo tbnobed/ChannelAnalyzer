@@ -1,0 +1,19 @@
+# Migration container - runs once to set up database schema
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY tsconfig.json ./
+
+# Install ALL dependencies (includes drizzle-kit, tsx for TypeScript support)
+RUN npm ci
+
+# Copy necessary files for migrations
+COPY shared ./shared
+COPY drizzle.config.ts ./drizzle.config.ts
+COPY db.ts ./db.ts
+
+# Default command runs migrations (drizzle-kit supports TypeScript natively)
+CMD ["npx", "drizzle-kit", "push", "--force"]

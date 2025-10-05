@@ -26,7 +26,7 @@ sudo sh get-docker.sh
 sudo usermod -aG docker $USER
 
 # Install Docker Compose
-sudo apt install docker-compose-plugin
+sudo apt install docker compose-plugin
 
 # Verify installation
 docker --version
@@ -243,7 +243,7 @@ docker compose logs app
 Common issues:
 - Database not ready: Wait a few seconds and try again
 - Environment variables not set: Check your `.env` file
-- Port 5000 already in use: Stop other services or change port in `docker-compose.yml`
+- Port 5000 already in use: Stop other services or change port in `docker compose.yml`
 
 ### Database connection errors
 
@@ -291,7 +291,7 @@ docker image prune -a
 For production use, you may want to adjust:
 
 1. **PostgreSQL connection pool** in `db.ts`
-2. **Docker resource limits** in `docker-compose.yml`:
+2. **Docker resource limits** in `docker compose.yml`:
    ```yaml
    services:
      app:
