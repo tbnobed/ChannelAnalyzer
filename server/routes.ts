@@ -40,13 +40,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? parseFloat(((avgLikes + avgComments) / avgViews * 100).toFixed(2))
         : 0;
 
-      const n8nResponse = await fetch("https://n8n.obtv.io/webhook/analyze-channel", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ channelId }),
-      });
-      const n8nData = await n8nResponse.json();
-      console.log("n8n webhook response:", JSON.stringify(n8nData, null, 2));
+      console.log("Calling n8n webhook with channelId:", channelId);
+      let n8nData: any = {};
+      
+      try {
+        const n8nResponse = await fetch("https://n8n.obtv.io/webhook/analyze-channel", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ channelId }),
+        });
+        
+        console.log("n8n webhook status:", n8nResponse.status);
+        
+        if (!n8nResponse.ok) {
+          console.error("n8n webhook error - status:", n8nResponse.status);
+          const errorText = await n8nResponse.text();
+          console.error("n8n webhook error response:", errorText);
+        } else {
+          const responseText = await n8nResponse.text();
+          console.log("n8n webhook raw response:", responseText);
+          
+          try {
+            n8nData = JSON.parse(responseText);
+            console.log("n8n webhook parsed data:", JSON.stringify(n8nData, null, 2));
+          } catch (parseError) {
+            console.error("Failed to parse n8n response as JSON:", parseError);
+          }
+        }
+      } catch (error) {
+        console.error("Error calling n8n webhook:", error);
+      }
 
       const analysisData = {
         channelId,
